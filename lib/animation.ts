@@ -1,15 +1,26 @@
 "use client";
 
 import gsap from "gsap";
+import type { MouseEvent } from "react";
 import Lenis from "lenis";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SCROLL_TO_TOP_EVENT } from "@/lib/preloader/reset-scroll-to-top";
 import { runScrollHoverSyncs } from "@/lib/scroll-hover-sync";
 let isScrollTriggerRegistered: boolean = false;
 let scrollLayoutRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+let hashScrollActive = false;
+let pendingLayoutRefresh = false;
+let nativeScrollFrameId: number | null = null;
+
+const NAVBAR_SCROLL_OFFSET = 80;
 
 /** Re-measure ScrollTrigger after in-flow Services panel height settles. */
 export function scheduleScrollLayoutRefresh(): void {
+  if (hashScrollActive) {
+    pendingLayoutRefresh = true;
+    return;
+  }
+
   if (scrollLayoutRefreshTimer !== null) {
     clearTimeout(scrollLayoutRefreshTimer);
   }
@@ -18,6 +29,61 @@ export function scheduleScrollLayoutRefresh(): void {
     scrollLayoutRefreshTimer = null;
     registerScrollTrigger().refresh();
   }, 80);
+}
+
+function flushPendingLayoutRefresh(): void {
+  if (!pendingLayoutRefresh) {
+    return;
+  }
+
+  pendingLayoutRefresh = false;
+  registerScrollTrigger().refresh();
+}
+
+const easeInOutCubic = (t: number): number =>
+  t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+
+function setScrollTop(y: number): void {
+  document.documentElement.scrollTop = y;
+  document.body.scrollTop = y;
+}
+
+function nativeScrollToY(
+  targetY: number,
+  duration: number,
+  onComplete?: () => void,
+): void {
+  if (nativeScrollFrameId !== null) {
+    cancelAnimationFrame(nativeScrollFrameId);
+    nativeScrollFrameId = null;
+  }
+
+  const html = document.documentElement;
+  const previousScrollBehavior = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto";
+
+  const startY = window.scrollY;
+  const distance = targetY - startY;
+  const startTime = performance.now();
+
+  const step = (now: number): void => {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / (duration * 1000), 1);
+    const eased = easeInOutCubic(progress);
+    setScrollTop(startY + distance * eased);
+
+    if (progress < 1) {
+      nativeScrollFrameId = requestAnimationFrame(step);
+      return;
+    }
+
+    setScrollTop(targetY);
+    nativeScrollFrameId = null;
+    html.style.scrollBehavior = previousScrollBehavior;
+    onComplete?.();
+  };
+
+  nativeScrollFrameId = requestAnimationFrame(step);
 }
 
 export function registerScrollTrigger(): typeof ScrollTrigger {
@@ -43,6 +109,11 @@ function isTouchPrimaryDevice(): boolean {
 }
 
 function refreshScrollTriggers(): void {
+  if (hashScrollActive) {
+    pendingLayoutRefresh = true;
+    return;
+  }
+
   registerScrollTrigger().refresh();
 }
 
@@ -69,8 +140,56 @@ function initHeavySectionScrollRefresh(): (() => void) | undefined {
 
 let lenisInstance: Lenis | null = null;
 
-const easeInOutCubic = (t: number): number =>
-  t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+export function getSectionHashFromHref(href: string): string | null {
+  const hashIndex = href.indexOf("#");
+
+  if (hashIndex === -1) {
+    return null;
+  }
+
+  const hash = href.slice(hashIndex + 1).split("#")[0];
+  return hash || null;
+}
+
+export function handleHomeHashLinkClick(
+  event: MouseEvent<HTMLAnchorElement>,
+  href: string,
+  pathname: string,
+  homePath: string,
+): void {
+  const hash = getSectionHashFromHref(href);
+
+  if (!hash || pathname !== homePath) {
+    return;
+  }
+
+  event.preventDefault();
+  requestAnimationFrame((): void => {
+    requestAnimationFrame((): void => {
+      scrollToHash(hash);
+    });
+  });
+}
+
+export function scrollToTop(): void {
+  hashScrollActive = true;
+
+  const finishScroll = (): void => {
+    hashScrollActive = false;
+    flushPendingLayoutRefresh();
+  };
+
+  if (lenisInstance) {
+    lenisInstance.scrollTo(0, {
+      lerp: 0,
+      duration: 1.2,
+      easing: easeInOutCubic,
+      onComplete: finishScroll,
+    });
+  } else {
+    nativeScrollToY(0, 1.2, finishScroll);
+  }
+}
 
 export function scrollToHash(id: string): void {
   const section = document.getElementById(id);
@@ -80,15 +199,26 @@ export function scrollToHash(id: string): void {
   const target =
     section.querySelector<HTMLElement>("[data-scroll-anchor]") ?? section;
 
+  const targetTop = target.getBoundingClientRect().top + window.scrollY;
+
+  hashScrollActive = true;
+
+  const finishHashScroll = (): void => {
+    hashScrollActive = false;
+    flushPendingLayoutRefresh();
+  };
+
   if (lenisInstance) {
     lenisInstance.scrollTo(target, {
-      offset: -80,
+      offset: -NAVBAR_SCROLL_OFFSET,
       lerp: 0,
       duration: 1.2,
       easing: easeInOutCubic,
+      onComplete: finishHashScroll,
     });
   } else {
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    const targetY = Math.max(0, targetTop - NAVBAR_SCROLL_OFFSET);
+    nativeScrollToY(targetY, 1.2, finishHashScroll);
   }
 }
 

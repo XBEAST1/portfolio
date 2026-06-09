@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react";
 import { Footer } from "@/components/footer/footer";
+import { HomeSectionHoverFill } from "@/components/home-section-hover-fill";
+import { HomeSectionLink } from "@/components/home-section-link";
 import { HoverFill } from "@/components/hover-fill";
-import { getProjectById, projects } from "@/lib/portfolio-data";
+import {
+  contactSectionHref,
+  getProjectById,
+  projects,
+  workSectionHref,
+} from "@/lib/portfolio-data";
 import { ProjectCaseStudyShell } from "./project-animations";
 
 interface ProjectPageProps {
@@ -72,8 +78,8 @@ export default async function ProjectPage(
       <section className="relative z-10 px-6 pt-32 md:px-10 md:pt-40">
         <div className="mx-auto max-w-7xl">
           <div className="case-hero-anim mb-10 opacity-0">
-            <Link
-              href="/#work"
+            <HomeSectionLink
+              href={workSectionHref}
               data-scroll-hover=""
               className="group inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.3em] text-gray-500 transition-colors hover:text-[#fde8bf]"
             >
@@ -82,7 +88,7 @@ export default async function ProjectPage(
                 aria-hidden="true"
               />
               Back To Work
-            </Link>
+            </HomeSectionLink>
           </div>
 
           <div className="grid gap-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-end">
@@ -118,15 +124,14 @@ export default async function ProjectPage(
                   <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 </HoverFill>
 
-                <HoverFill
-                  as="link"
-                  href="/#contact"
+                <HomeSectionHoverFill
+                  href={contactSectionHref}
                   className="rounded-full border border-white/10 px-7 py-4 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf]"
                   contentClassName="gap-3 text-xs font-bold uppercase tracking-[0.22em] text-white group-hocus:text-black"
                 >
                   Discuss Similar Work
                   <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                </HoverFill>
+                </HomeSectionHoverFill>
               </div>
             </div>
 
@@ -388,15 +393,14 @@ export default async function ProjectPage(
                 {project.liveDemoLabel}
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
               </HoverFill>
-              <HoverFill
-                as="link"
-                href="/#work"
+              <HomeSectionHoverFill
+                href={workSectionHref}
                 className="rounded-full border border-white/10 px-7 py-4 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf]"
                 contentClassName="gap-3 text-xs font-bold uppercase tracking-[0.22em] text-white group-hocus:text-black"
               >
                 More Work
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </HoverFill>
+              </HomeSectionHoverFill>
             </div>
           </div>
         </div>

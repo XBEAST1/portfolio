@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { contactSectionHref, heroStatusSlides } from "@/lib/portfolio-data";
+import { useHomeSectionLinkClick } from "@/lib/use-home-section-link";
 
 const ROTATION_INTERVAL_MS: number = 3000;
 
 export function HeroStatusCard(): React.ReactElement {
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const onContactClick = useHomeSectionLinkClick(contactSectionHref);
 
   useEffect((): (() => void) => {
     const intervalId: number = window.setInterval((): void => {
@@ -28,6 +30,7 @@ export function HeroStatusCard(): React.ReactElement {
     <div className="bento-item h-full min-h-0">
       <Link
         href={contactSectionHref}
+        onClick={onContactClick}
         className="group flex h-full min-h-0 flex-col justify-between rounded-4xl border border-white/10 bg-[#0a0a0a] p-5 md:p-6 text-white transition-all duration-500 hover:border-[#fde8bf]/50 hover:bg-[#fde8bf]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf]"
       >
         <div className="flex items-center justify-between">

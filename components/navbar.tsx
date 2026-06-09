@@ -3,9 +3,13 @@
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type MouseEvent, useEffect, useState } from "react";
-import { HoverFill } from "@/components/hover-fill";
-import { scrollToHash } from "@/lib/animation";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
+import {
+  HOVER_FILL_DURATION_MS,
+  HoverFill,
+  type HoverFillState,
+} from "@/components/hover-fill";
+import { handleHomeHashLinkClick, scrollToTop } from "@/lib/animation";
 import {
   contactSectionHref,
   homeHref,
@@ -20,6 +24,9 @@ const mainNavLinks = navigationLinks.filter(
 export function Navbar(): React.ReactElement {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [menuFillState, setMenuFillState] = useState<HoverFillState>("auto");
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const unfillTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect((): (() => void) => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -28,12 +35,48 @@ export function Navbar(): React.ReactElement {
     };
   }, [isOpen]);
 
-  const closeMenu = (): void => {
-    setIsOpen(false);
+  useEffect((): (() => void) => {
+    return (): void => {
+      if (unfillTimerRef.current !== null) {
+        clearTimeout(unfillTimerRef.current);
+      }
+    };
+  }, []);
+
+  const clearStickyHover = (button: HTMLButtonElement | null): void => {
+    if (!button) {
+      return;
+    }
+
+    button.blur();
+    button.removeAttribute("data-cursor-hover");
+    button.style.pointerEvents = "none";
+
+    requestAnimationFrame((): void => {
+      requestAnimationFrame((): void => {
+        button.style.pointerEvents = "";
+      });
+    });
   };
 
-  const scrollToTop = (): void => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const animateMenuButtonUnfill = (): void => {
+    if (unfillTimerRef.current !== null) {
+      clearTimeout(unfillTimerRef.current);
+    }
+
+    setMenuFillState("unfilled");
+    clearStickyHover(menuButtonRef.current);
+
+    unfillTimerRef.current = setTimeout((): void => {
+      unfillTimerRef.current = null;
+      setMenuFillState("auto");
+      clearStickyHover(menuButtonRef.current);
+    }, HOVER_FILL_DURATION_MS);
+  };
+
+  const closeMenu = (): void => {
+    setIsOpen(false);
+    animateMenuButtonUnfill();
   };
 
   const handleBrandClick = (event: MouseEvent<HTMLAnchorElement>): void => {
@@ -44,7 +87,11 @@ export function Navbar(): React.ReactElement {
     }
 
     event.preventDefault();
-    scrollToTop();
+    requestAnimationFrame((): void => {
+      requestAnimationFrame((): void => {
+        scrollToTop();
+      });
+    });
   };
 
   const handleHashLinkClick = (
@@ -52,14 +99,7 @@ export function Navbar(): React.ReactElement {
     href: string,
   ): void => {
     closeMenu();
-
-    const hash = href.split("#")[1];
-    if (!hash) return;
-
-    if (pathname === homeHref) {
-      event.preventDefault();
-      scrollToHash(hash);
-    }
+    handleHomeHashLinkClick(event, href, pathname, homeHref);
   };
 
   return (
@@ -119,12 +159,20 @@ export function Navbar(): React.ReactElement {
             </div>
 
             <HoverFill
+              ref={menuButtonRef}
               as="button"
               type="button"
+              fillState={menuFillState}
               className="rounded-full p-2 text-white md:hidden"
               contentClassName="flex items-center justify-center text-white transition-colors duration-500 group-hocus:text-black"
               onClick={(): void =>
-                setIsOpen((currentValue: boolean): boolean => !currentValue)
+                setIsOpen((currentValue: boolean): boolean => {
+                  if (currentValue) {
+                    animateMenuButtonUnfill();
+                  }
+
+                  return !currentValue;
+                })
               }
               aria-expanded={isOpen}
               aria-controls="mobile-navigation"

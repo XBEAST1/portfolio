@@ -62,7 +62,7 @@ export function Services(): React.ReactElement {
           scrollTrigger: {
             trigger: ".services-list",
             start: "top 150%",
-            toggleActions: "play none none reset",
+            toggleActions: "play none none none",
           },
           delay: i * 0.1,
         });

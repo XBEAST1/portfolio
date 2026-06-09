@@ -125,33 +125,33 @@ export function ProjectCaseStudyShell({
       const heroCopy =
         pageRef.current?.querySelector<HTMLElement>(".case-hero-copy");
 
-      if (heroFrame && heroCopy) {
-        const getHeroCopyLift = (): number =>
-          Math.min(heroFrame.offsetHeight * 0.2, 100);
-
-        gsap.set(heroCopy, { y: 0 });
-
-        gsap.to(heroCopy, {
-          y: () => -getHeroCopyLift(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: pageRef.current,
-            start: "top top",
-            end: () => `+=${heroFrame.offsetHeight}`,
-            scrub: 0.65,
-            invalidateOnRefresh: true,
-          },
-        });
-      }
-
       const galleryFigures = gsap.utils.toArray<HTMLElement>(
         ".case-image",
         pageRef.current,
       );
 
-      const galleryParallax = gsap.matchMedia();
+      const desktopParallax = gsap.matchMedia();
 
-      galleryParallax.add("(min-width: 1024px)", () => {
+      desktopParallax.add("(min-width: 1024px)", () => {
+        if (heroFrame && heroCopy) {
+          const getHeroCopyLift = (): number =>
+            Math.min(heroFrame.offsetHeight * 0.2, 100);
+
+          gsap.set(heroCopy, { y: 0 });
+
+          gsap.to(heroCopy, {
+            y: () => -getHeroCopyLift(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: pageRef.current,
+              start: "top top",
+              end: () => `+=${heroFrame.offsetHeight}`,
+              scrub: 0.65,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+
         galleryFigures.forEach((figure) => {
           const indexColumn = figure.querySelector<HTMLElement>(
             ".case-gallery-index",

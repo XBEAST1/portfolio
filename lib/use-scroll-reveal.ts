@@ -66,7 +66,7 @@ export function useScrollReveal(
               trigger: config.trigger || ref.current,
               start: config.start ?? "top 75%",
               once: config.once ?? false,
-              toggleActions: "play none none reset",
+              toggleActions: "play none none none",
             },
           },
         );

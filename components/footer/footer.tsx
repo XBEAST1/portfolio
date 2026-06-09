@@ -30,30 +30,53 @@ export function Footer(): React.ReactElement {
   ]);
 
   useGSAP(
-    (): void => {
+    () => {
       if (prefersReducedMotion()) {
         return;
       }
 
       const ScrollTrigger = registerScrollTrigger();
+      const mm = gsap.matchMedia();
 
-      gsap.to(".footer-letter", {
-        y: (index: number): number => {
-          const direction: number = index % 2 === 0 ? -1 : 1;
-          const amount: number = 30 + (index % 3) * 6;
+      mm.add("(min-width: 768px)", (): gsap.core.Tween => {
+        return gsap.to(".footer-letter", {
+          y: (index: number): number => {
+            const direction: number = index % 2 === 0 ? -1 : 1;
+            const amount: number = 30 + (index % 3) * 6;
 
-          return direction * amount;
-        },
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".footer-heading-wrap",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
+            return direction * amount;
+          },
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".footer-heading-wrap",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      });
+
+      mm.add("(max-width: 767px)", (): gsap.core.Tween => {
+        return gsap.to(".footer-letter", {
+          y: (index: number): number => {
+            const direction: number = index % 2 === 0 ? -1 : 1;
+            const amount: number = 10 + (index % 3) * 2;
+
+            return direction * amount;
+          },
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".footer-heading-wrap",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
       });
 
       ScrollTrigger.refresh();
+
+      return (): void => mm.revert();
     },
     { scope: footerRef },
   );
@@ -71,10 +94,10 @@ export function Footer(): React.ReactElement {
           return (
             <div
               key={word}
-              className={`overflow-hidden ${!isFirst ? "mt-[-0.45em]" : ""}`}
+              className={`overflow-hidden ${!isFirst ? "mt-[-0.2em] md:mt-[-0.45em]" : ""}`}
             >
               <h2
-                className={`footer-heading-anim origin-bottom cursor-default select-none font-heading text-[13.5vw] font-black uppercase leading-[0.85] tracking-tighter ${
+                className={`footer-heading-anim origin-bottom cursor-default select-none font-heading text-[11.5vw] font-black uppercase leading-[0.9] tracking-tight sm:text-[12.5vw] sm:leading-[0.88] sm:tracking-tighter md:text-[13.5vw] md:leading-[0.85] ${
                   isFirst ? "inline-block text-left" : "block w-full text-right"
                 } ${isFirst ? "pt-[0.35em] pb-[0.25em]" : ""} ${
                   !isFirst && isLast ? "pt-[0.35em] pb-[0.35em]" : ""

@@ -20,9 +20,12 @@ import {
   resumePdfHref,
   roleTitle,
 } from "@/lib/portfolio-data";
+import { useHomeSectionLinkClick } from "@/lib/use-home-section-link";
 
 export function Hero(): React.ReactElement {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const onAboutClick = useHomeSectionLinkClick(aboutSectionHref);
+  const onContactClick = useHomeSectionLinkClick(contactSectionHref);
 
   useHeroAnimation(sectionRef);
 
@@ -30,7 +33,7 @@ export function Hero(): React.ReactElement {
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex h-dvh max-h-dvh w-full flex-col overflow-hidden bg-[#050505] p-3 pt-30 text-white md:p-6 md:pt-30"
+      className="relative flex h-dvh max-h-dvh w-full flex-col overflow-hidden bg-[#050505] p-[clamp(0.75rem,1.5dvh,1.5rem)] pt-[clamp(4.5rem,14dvh,7.5rem)] text-white"
     >
       <Preloader
         brandName={navbarBrandName}
@@ -76,9 +79,9 @@ export function Hero(): React.ReactElement {
                         ): React.ReactElement => (
                           <span
                             key={`${word}-${character}-${index}`}
-                            className="inline-block overflow-hidden align-bottom"
+                            className="inline-block overflow-hidden px-[0.03em] align-bottom"
                           >
-                            <span className="char-reveal inline-block origin-bottom pb-0.5 sm:pb-1">
+                            <span className="char-reveal inline-block origin-bottom">
                               {character}
                             </span>
                           </span>
@@ -116,6 +119,7 @@ export function Hero(): React.ReactElement {
                 )}
                 <Link
                   href={aboutSectionHref}
+                  onClick={onAboutClick}
                   className="rounded bg-white px-2 py-1 text-xs font-bold text-black transition-opacity hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf]"
                 >
                   + More
@@ -140,6 +144,7 @@ export function Hero(): React.ReactElement {
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60" />
             <Link
               href={contactSectionHref}
+              onClick={onContactClick}
               className="absolute bottom-6 left-6 rounded-lg border border-white/10 bg-white/10 px-4 py-2 backdrop-blur-md transition-colors hover:border-white/30 hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf]"
             >
               <p className="mb-1 text-[10px] uppercase tracking-wider text-gray-300">

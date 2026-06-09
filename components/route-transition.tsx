@@ -43,6 +43,10 @@ function getClosestAnchor(
   return target.closest("a[href]");
 }
 
+function isSamePathNavigation(destination: URL): boolean {
+  return destination.pathname === window.location.pathname;
+}
+
 function shouldHandleNavigation(
   event: MouseEvent,
   anchor: HTMLAnchorElement,
@@ -65,7 +69,11 @@ function shouldHandleNavigation(
     return false;
   }
 
-  return destination.pathname !== window.location.pathname;
+  if (isSamePathNavigation(destination)) {
+    return false;
+  }
+
+  return true;
 }
 
 export function RouteTransition(): React.ReactElement {
