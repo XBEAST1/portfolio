@@ -202,7 +202,7 @@ export function Work(): React.ReactElement {
                     src={project.image}
                     alt={`${project.title} project preview`}
                     fill
-                    sizes="100vw"
+                    sizes="calc(100vw - 3rem)"
                     className="object-cover transition-transform duration-700 group-hocus:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60 transition-opacity duration-500 group-hocus:opacity-80" />

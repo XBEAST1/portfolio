@@ -83,7 +83,11 @@ export function RouteTransition(): React.ReactElement {
   const topPanelRef = useRef<HTMLDivElement | null>(null);
   const bottomPanelRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const leftCornerRef = useRef<HTMLDivElement | null>(null);
+  const rightCornerRef = useRef<HTMLDivElement | null>(null);
   const ruleRef = useRef<HTMLDivElement | null>(null);
+
+  const ENTRANCE_HOLD_DURATION = 1;
   const activeTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const pendingDestinationRef = useRef<string | null>(null);
   const isTransitioningRef = useRef<boolean>(false);
@@ -100,6 +104,10 @@ export function RouteTransition(): React.ReactElement {
         filter: "blur(8px)",
       });
       gsap.set(ruleRef.current, { scaleX: 0, transformOrigin: "left center" });
+      gsap.set([leftCornerRef.current, rightCornerRef.current], {
+        y: 20,
+        opacity: 0,
+      });
     },
     { scope: rootRef },
   );
@@ -150,6 +158,10 @@ export function RouteTransition(): React.ReactElement {
           filter: "blur(8px)",
         })
         .set(ruleRef.current, { scaleX: 0, transformOrigin: "left center" })
+        .set([leftCornerRef.current, rightCornerRef.current], {
+          y: 20,
+          opacity: 0,
+        })
         .to([topPanelRef.current, bottomPanelRef.current], {
           yPercent: 0,
           duration: 0.78,
@@ -173,7 +185,19 @@ export function RouteTransition(): React.ReactElement {
             ease: "power3.inOut",
           },
           "-=0.48",
-        );
+        )
+        .to(
+          [leftCornerRef.current, rightCornerRef.current],
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: "power4.out",
+          },
+          "-=0.45",
+        )
+        .to({}, { duration: ENTRANCE_HOLD_DURATION });
     };
 
     document.addEventListener("click", handleClick, true);
@@ -253,7 +277,7 @@ export function RouteTransition(): React.ReactElement {
     >
       <div
         ref={topPanelRef}
-        className="absolute inset-x-0 top-0 h-1/2 bg-[#050505]"
+        className="absolute inset-x-0 top-0 z-20 h-1/2 bg-[#050505]"
       >
         <div className="absolute inset-0 bg-noise opacity-[0.12]" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-[#fde8bf]/50 to-transparent" />
@@ -261,15 +285,31 @@ export function RouteTransition(): React.ReactElement {
 
       <div
         ref={bottomPanelRef}
-        className="absolute inset-x-0 bottom-0 h-1/2 bg-[#050505]"
+        className="absolute inset-x-0 bottom-0 z-20 h-1/2 bg-[#050505]"
       >
         <div className="absolute inset-0 bg-noise opacity-[0.12]" />
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#fde8bf]/50 to-transparent" />
+        <div
+          ref={leftCornerRef}
+          className="absolute bottom-8 left-8 z-10 translate-y-5 opacity-0"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
+            Route Shift
+          </p>
+        </div>
+        <div
+          ref={rightCornerRef}
+          className="absolute bottom-8 right-8 z-10 translate-y-5 opacity-0"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
+            Smooth Handoff
+          </p>
+        </div>
       </div>
 
       <div
         ref={contentRef}
-        className="absolute inset-0 flex flex-col items-center justify-center px-6"
+        className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6"
       >
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72vmin] w-[72vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#fde8bf]/10 blur-[120px]" />
 
@@ -298,13 +338,6 @@ export function RouteTransition(): React.ReactElement {
             />
           </div>
         </div>
-      </div>
-
-      <div className="absolute bottom-8 left-8 font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
-        Route Shift
-      </div>
-      <div className="absolute bottom-8 right-8 font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
-        Smooth Handoff
       </div>
     </div>
   );
