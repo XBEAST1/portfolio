@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { scheduleScrollLayoutRefresh } from "@/lib/animation";
+import { lockPageScroll, unlockPageScroll } from "@/lib/lock-scroll";
 import { navbarBrandName } from "@/lib/portfolio-data";
 import { resetScrollToTop } from "@/lib/preloader/reset-scroll-to-top";
 import { markSpaNavigationOccurred } from "@/lib/preloader/preloader-state";
@@ -131,6 +132,7 @@ export function RouteTransition(): React.ReactElement {
 
       pendingDestinationRef.current = href;
       isTransitioningRef.current = true;
+      lockPageScroll();
       markSpaNavigationOccurred();
       setTransitionLabel(getTransitionLabel(destination));
       activeTimelineRef.current?.kill();
@@ -221,6 +223,7 @@ export function RouteTransition(): React.ReactElement {
         defaults: { ease: "expo.inOut" },
         onComplete: (): void => {
           isTransitioningRef.current = false;
+          unlockPageScroll({ restoreScroll: false });
           scheduleScrollLayoutRefresh();
         },
       });

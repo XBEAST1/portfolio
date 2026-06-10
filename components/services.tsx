@@ -169,6 +169,7 @@ export function Services(): React.ReactElement {
                   <button
                     id={triggerId}
                     type="button"
+                    data-haptic="select"
                     className={`service-item-anim group flex w-full cursor-pointer appearance-none flex-row items-center justify-between gap-4 bg-transparent py-10 text-left transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf] ${isOpen ? "px-4" : ""}`}
                     aria-expanded={isOpen}
                     aria-controls={panelId}

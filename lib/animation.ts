@@ -104,7 +104,7 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function isTouchPrimaryDevice(): boolean {
+export function isTouchPrimaryDevice(): boolean {
   return window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 }
 
@@ -139,6 +139,18 @@ function initHeavySectionScrollRefresh(): (() => void) | undefined {
 }
 
 let lenisInstance: Lenis | null = null;
+
+export function setPageScrollPaused(paused: boolean): void {
+  if (!lenisInstance) {
+    return;
+  }
+
+  if (paused) {
+    lenisInstance.stop();
+  } else {
+    lenisInstance.start();
+  }
+}
 
 export function getSectionHashFromHref(href: string): string | null {
   const hashIndex = href.indexOf("#");

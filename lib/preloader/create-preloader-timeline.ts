@@ -1,5 +1,7 @@
 import gsap from "gsap";
 import { scheduleScrollLayoutRefresh } from "@/lib/animation";
+import { triggerMilestoneHaptic } from "@/lib/haptics";
+import { lockPageScroll, unlockPageScroll } from "@/lib/lock-scroll";
 import {
   PRELOADER_ANIMATION,
   PRELOADER_PARTS,
@@ -135,6 +137,8 @@ export function skipPreloader(
 
   gsap.set(scope, { autoAlpha: 0, pointerEvents: "none" });
   stopRingRotation(ringAccent);
+  triggerMilestoneHaptic("success");
+  unlockPageScroll();
 }
 
 export function appendPreloaderTimeline(
@@ -148,6 +152,8 @@ export function appendPreloaderTimeline(
       defaults: { ease: "power4.out" },
     });
   const counter: { value: number } = { value: 0 };
+
+  lockPageScroll();
 
   gsap.set(scope, { autoAlpha: 1, pointerEvents: "auto" });
   setPreloaderInitialState(elements);
@@ -258,6 +264,10 @@ export function appendPreloaderTimeline(
         yPercent: 100,
         duration: PRELOADER_ANIMATION.curtainDuration,
         ease: "power4.inOut",
+        onComplete: (): void => {
+          triggerMilestoneHaptic("success");
+          unlockPageScroll();
+        },
       },
       "<",
     )

@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { type ReactNode, useRef } from "react";
 import { Preloader } from "@/components/preloader";
 import { prefersReducedMotion, registerScrollTrigger } from "@/lib/animation";
+import { triggerRevealHaptic } from "@/lib/haptics";
 import { mediaQueryLg } from "@/lib/breakpoints";
 import { navbarBrandName, roleTitle, location } from "@/lib/portfolio-data";
 import { PRELOADER_PARTS } from "@/lib/preloader/constants";
@@ -130,6 +131,15 @@ export function ProjectCaseStudyShell({
         ".case-image",
         pageRef.current,
       );
+
+      galleryFigures.forEach((figure): void => {
+        ScrollTrigger.create({
+          trigger: figure,
+          start: "top 82%",
+          onEnter: triggerRevealHaptic,
+          onEnterBack: triggerRevealHaptic,
+        });
+      });
 
       const desktopParallax = gsap.matchMedia();
 
