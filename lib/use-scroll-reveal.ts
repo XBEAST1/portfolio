@@ -2,8 +2,15 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import type { ScrollTrigger as ScrollTriggerPlugin } from "gsap/ScrollTrigger";
 import { RefObject } from "react";
 import { prefersReducedMotion, registerScrollTrigger } from "@/lib/animation";
+
+/** Play when entering from above or below after the section fully left the viewport. */
+export const SECTION_REPLAY_TOGGLE_ACTIONS = "play none play none" as const;
+
+export const SECTION_EXIT_START = "top bottom" as const;
+export const SECTION_EXIT_END = "bottom top" as const;
 
 export interface ScrollRevealConfig {
   selector: string;
@@ -15,6 +22,28 @@ export interface ScrollRevealConfig {
   trigger?: string | Element | null;
   ease?: string;
   once?: boolean;
+}
+
+export function attachSectionExitReset(
+  section: HTMLElement | null,
+  animation: gsap.core.Animation,
+): ScrollTriggerPlugin | undefined {
+  if (!section) {
+    return undefined;
+  }
+
+  const ScrollTrigger = registerScrollTrigger();
+  const resetAnimation = (): void => {
+    animation.progress(0).pause();
+  };
+
+  return ScrollTrigger.create({
+    trigger: section,
+    start: SECTION_EXIT_START,
+    end: SECTION_EXIT_END,
+    onLeave: resetAnimation,
+    onLeaveBack: resetAnimation,
+  });
 }
 
 export function useScrollReveal(
@@ -48,7 +77,8 @@ export function useScrollReveal(
               ? 0
               : 40;
 
-        gsap.fromTo(
+        const playOnce = config.once ?? false;
+        const animation = gsap.fromTo(
           config.selector,
           {
             y: initialY,
@@ -65,11 +95,17 @@ export function useScrollReveal(
             scrollTrigger: {
               trigger: config.trigger || ref.current,
               start: config.start ?? "top 75%",
-              once: config.once ?? false,
-              toggleActions: "play none none none",
+              once: playOnce,
+              toggleActions: playOnce
+                ? "play none none none"
+                : SECTION_REPLAY_TOGGLE_ACTIONS,
             },
           },
         );
+
+        if (!playOnce) {
+          attachSectionExitReset(ref.current, animation);
+        }
       });
     },
     { scope: ref },

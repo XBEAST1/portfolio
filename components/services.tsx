@@ -17,7 +17,11 @@ import {
   useServicePanels,
 } from "@/lib/service-panels";
 
-import { useScrollReveal } from "@/lib/use-scroll-reveal";
+import {
+  attachSectionExitReset,
+  SECTION_REPLAY_TOGGLE_ACTIONS,
+  useScrollReveal,
+} from "@/lib/use-scroll-reveal";
 
 export function Services(): React.ReactElement {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -49,6 +53,14 @@ export function Services(): React.ReactElement {
 
       registerScrollTrigger();
 
+      const masterTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".services-list",
+          start: "top 150%",
+          toggleActions: SECTION_REPLAY_TOGGLE_ACTIONS,
+        },
+      });
+
       rows.forEach((row, i): void => {
         const button =
           row.querySelector<HTMLButtonElement>(".service-item-anim");
@@ -59,39 +71,34 @@ export function Services(): React.ReactElement {
         if (divider) gsap.set(divider, { scaleX: 0 });
         if (arrowWrap) gsap.set(arrowWrap, { scale: 0 });
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: ".services-list",
-            start: "top 150%",
-            toggleActions: "play none none none",
-          },
-          delay: i * 0.1,
-        });
+        const rowStart = i * 0.1;
 
         if (divider) {
-          tl.to(divider, { scaleX: 1, duration: 1.0, ease: "power4.out" }, 0);
+          masterTl.to(
+            divider,
+            { scaleX: 1, duration: 1.0, ease: "power4.out" },
+            rowStart,
+          );
         }
 
         if (button) {
-          tl.to(
+          masterTl.to(
             button,
             { yPercent: 0, duration: 0.75, ease: "power4.out" },
-            0.05,
+            rowStart + 0.05,
           );
         }
 
         if (arrowWrap) {
-          tl.to(
+          masterTl.to(
             arrowWrap,
             { scale: 1, duration: 0.5, ease: "back.out(2)" },
-            0.55,
+            rowStart + 0.55,
           );
         }
-
-        tl.eventCallback("onComplete", (): void => {
-          tl.scrollTrigger?.kill(false);
-        });
       });
+
+      attachSectionExitReset(sectionRef.current, masterTl);
     },
     { scope: sectionRef },
   );

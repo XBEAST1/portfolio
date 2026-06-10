@@ -44,7 +44,7 @@ export function Hero(): React.ReactElement {
 
       <div className="pointer-events-none absolute inset-0 z-0 bg-noise opacity-20" />
 
-      <div className="relative z-10 mx-auto grid min-h-0 w-full max-w-450 flex-1 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-3 md:grid-cols-12 md:grid-rows-1 md:gap-4">
+      <div className="relative z-10 grid min-h-0 w-full flex-1 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-3 md:grid-cols-12 md:grid-rows-1 md:gap-4">
         <div className="flex min-h-0 flex-col gap-3 md:col-span-7 md:h-full md:gap-4">
           <div className="bento-item group relative flex shrink-0 flex-col gap-4 rounded-4xl border border-white/10 bg-white/5 p-4 sm:min-h-0 sm:flex-1 sm:justify-between sm:gap-0 sm:overflow-hidden sm:p-5 md:p-8 lg:p-10">
             <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">

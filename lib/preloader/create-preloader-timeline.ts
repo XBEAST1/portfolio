@@ -183,9 +183,21 @@ export function appendPreloaderTimeline(
       "-=0.5",
     )
     .fromTo(
-      [elements.progress, ...elements.corners],
+      elements.progress,
       { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.7, stagger: 0.1 },
+      { y: 0, opacity: 1, duration: 0.7 },
+      "-=0.45",
+    )
+    .fromTo(
+      elements.corners,
+      { y: 20, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.7,
+        stagger: 0.1,
+        ease: "power4.out",
+      },
       "-=0.45",
     )
     .fromTo(
@@ -218,19 +230,16 @@ export function appendPreloaderTimeline(
       },
       "<",
     )
-    .to(
-      [elements.content, ...elements.corners],
-      {
-        opacity: 0,
-        scale: 0.96,
-        filter: "blur(6px)",
-        duration: PRELOADER_ANIMATION.exitDuration,
-        ease: "power3.in",
-        onStart(): void {
-          stopRingRotation(elements.ringAccent);
-        },
+    .to(elements.content, {
+      opacity: 0,
+      scale: 0.96,
+      filter: "blur(6px)",
+      duration: PRELOADER_ANIMATION.exitDuration,
+      ease: "power3.in",
+      onStart(): void {
+        stopRingRotation(elements.ringAccent);
       },
-    )
+    })
     .to(
       elements.curtainTop,
       {

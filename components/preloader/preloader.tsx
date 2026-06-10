@@ -36,6 +36,22 @@ export function Preloader({
       >
         <div className="pointer-events-none absolute inset-0 bg-noise opacity-[0.12]" />
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
+        <div
+          data-preloader={PRELOADER_PARTS.corner}
+          className="absolute bottom-8 left-8 z-10 max-w-xs translate-y-5 opacity-0"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
+            {roleTitle}
+          </p>
+        </div>
+        <div
+          data-preloader={PRELOADER_PARTS.corner}
+          className="absolute bottom-8 right-8 z-10 translate-y-5 opacity-0"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
+            {location}
+          </p>
+        </div>
       </div>
 
       <div
@@ -92,24 +108,6 @@ export function Preloader({
             />
           </div>
         </div>
-      </div>
-
-      <div
-        data-preloader={PRELOADER_PARTS.corner}
-        className="absolute bottom-8 left-8 z-30 max-w-xs translate-y-5 opacity-0"
-      >
-        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
-          {roleTitle}
-        </p>
-      </div>
-
-      <div
-        data-preloader={PRELOADER_PARTS.corner}
-        className="absolute bottom-8 right-8 z-30 translate-y-5 opacity-0"
-      >
-        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
-          {location}
-        </p>
       </div>
     </div>
   );

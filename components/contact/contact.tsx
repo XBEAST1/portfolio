@@ -8,7 +8,11 @@ import { HoverFill } from "@/components/hover-fill";
 import { prefersReducedMotion, registerScrollTrigger } from "@/lib/animation";
 import { emailMailtoHref } from "@/lib/portfolio-data";
 
-import { useScrollReveal } from "@/lib/use-scroll-reveal";
+import {
+  attachSectionExitReset,
+  SECTION_REPLAY_TOGGLE_ACTIONS,
+  useScrollReveal,
+} from "@/lib/use-scroll-reveal";
 
 export function Contact(): React.ReactElement {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -34,9 +38,9 @@ export function Contact(): React.ReactElement {
         return;
       }
 
-      const ScrollTrigger = registerScrollTrigger();
+      registerScrollTrigger();
 
-      gsap.fromTo(
+      const lineAnimation = gsap.fromTo(
         ".contact-line",
         { scaleX: 0 },
         {
@@ -47,11 +51,12 @@ export function Contact(): React.ReactElement {
           scrollTrigger: {
             trigger: ".contact-line",
             start: "top 85%",
-            once: true,
-            toggleActions: "play none none none",
+            toggleActions: SECTION_REPLAY_TOGGLE_ACTIONS,
           },
         },
       );
+
+      attachSectionExitReset(sectionRef.current, lineAnimation);
     },
     { scope: sectionRef },
   );
@@ -62,7 +67,7 @@ export function Contact(): React.ReactElement {
       id="contact"
       className="relative w-full border-t border-white/10 bg-[#050505] px-6 py-24 text-white md:px-10 md:py-32"
     >
-      <div className="flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-0">
+      <div className="portfolio-section-container flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-0">
         <div className="max-w-3xl">
           <div className="contact-heading-wrap mb-8">
             <div className="overflow-hidden">

@@ -70,7 +70,7 @@ export function Work(): React.ReactElement {
     >
       <div className="portfolio-section-container px-6 md:px-10">
         <div className="mb-20 flex flex-col items-start justify-between border-b border-white/10 pb-6 md:flex-row md:items-end">
-          <div className="overflow-hidden">
+          <div>
             <h2 className="work-header-anim font-heading text-[10vw] font-black uppercase leading-[0.8] tracking-tighter text-white opacity-0 md:text-[6vw]">
               Selected
               <br />
