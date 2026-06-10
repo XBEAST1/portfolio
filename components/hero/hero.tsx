@@ -20,6 +20,7 @@ import {
   resumePdfHref,
   roleTitle,
 } from "@/lib/portfolio-data";
+import { mediaQueryMd } from "@/lib/breakpoints";
 import { useHomeSectionLinkClick } from "@/lib/use-home-section-link";
 
 export function Hero(): React.ReactElement {
@@ -137,7 +138,7 @@ export function Hero(): React.ReactElement {
                 alt={`Portrait of ${displayName}`}
                 fill
                 priority
-                sizes="(min-width: 768px) 42vw, 100vw"
+                sizes={`${mediaQueryMd} 42vw, 100vw`}
                 className="object-cover grayscale transition-transform duration-700 hover:scale-105"
               />
             </div>

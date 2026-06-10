@@ -3,6 +3,7 @@
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/animation";
+import { mediaQueryMd } from "@/lib/breakpoints";
 import { registerScrollHoverSync } from "@/lib/scroll-hover-sync";
 
 const INTERACTIVE_SELECTOR: string =
@@ -177,7 +178,20 @@ export function CustomCursor(): React.ReactElement {
       moveRingY(y);
     };
 
+    const shouldApplyHoverAttribute = (): boolean => {
+      return window.matchMedia(mediaQueryMd).matches;
+    };
+
     const setActiveHoverTarget = (target: HTMLElement | null): void => {
+      if (!shouldApplyHoverAttribute()) {
+        if (activeHoverTarget) {
+          activeHoverTarget.removeAttribute(CURSOR_HOVER_ATTRIBUTE);
+          activeHoverTarget = null;
+        }
+
+        return;
+      }
+
       if (activeHoverTarget === target) {
         return;
       }

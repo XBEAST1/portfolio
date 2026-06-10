@@ -30,7 +30,10 @@ export function Experience(): React.ReactElement {
       className="section-heavy relative w-full overflow-hidden border-t border-white/10 bg-[#050505] py-24 text-white md:py-40"
     >
       <SectionMarquee />
-      <div data-scroll-anchor className="container relative z-10 mx-auto pt-20 px-6 md:px-10">
+      <div
+        data-scroll-anchor
+        className="portfolio-section-container relative z-10 pt-20 px-6 md:px-10"
+      >
         <div className="experience-wrap mb-24">
           <div className="experience-line mb-2 overflow-hidden">
             <h2 className="inline-block origin-bottom font-heading text-[11vw] font-black uppercase leading-[0.85] tracking-tighter text-white md:text-[8vw]">

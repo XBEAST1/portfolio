@@ -9,11 +9,3 @@ export function setServicePanelsState(state: ServicePanelsState): void {
 
   document.documentElement.setAttribute(ATTRIBUTE, state);
 }
-
-export function isServicePanelsAnimating(): boolean {
-  if (typeof document === "undefined") {
-    return false;
-  }
-
-  return document.documentElement.getAttribute(ATTRIBUTE) === "animating";
-}

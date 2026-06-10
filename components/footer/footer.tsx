@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef } from "react";
 import { prefersReducedMotion, registerScrollTrigger } from "@/lib/animation";
+import { mediaQueryMd } from "@/lib/breakpoints";
 import { displayName, location, roleTitle } from "@/lib/portfolio-data";
 import { useScrollReveal } from "@/lib/use-scroll-reveal";
 
@@ -38,7 +39,7 @@ export function Footer(): React.ReactElement {
       const ScrollTrigger = registerScrollTrigger();
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 768px)", (): gsap.core.Tween => {
+      mm.add(mediaQueryMd, (): gsap.core.Tween => {
         return gsap.to(".footer-letter", {
           y: (index: number): number => {
             const direction: number = index % 2 === 0 ? -1 : 1;

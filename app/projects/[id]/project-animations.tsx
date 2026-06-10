@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { type ReactNode, useRef } from "react";
 import { Preloader } from "@/components/preloader";
 import { prefersReducedMotion, registerScrollTrigger } from "@/lib/animation";
+import { mediaQueryLg } from "@/lib/breakpoints";
 import { navbarBrandName, roleTitle, location } from "@/lib/portfolio-data";
 import { PRELOADER_PARTS } from "@/lib/preloader/constants";
 import {
@@ -132,7 +133,7 @@ export function ProjectCaseStudyShell({
 
       const desktopParallax = gsap.matchMedia();
 
-      desktopParallax.add("(min-width: 1024px)", () => {
+      desktopParallax.add(mediaQueryLg, () => {
         if (heroFrame && heroCopy) {
           const getHeroCopyLift = (): number =>
             Math.min(heroFrame.offsetHeight * 0.2, 100);

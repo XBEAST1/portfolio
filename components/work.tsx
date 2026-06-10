@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import {
+  getHoverFillTouchHandlers,
   HoverFillOverlay,
   HOVER_FILL_DURATION_CLASS,
   HOVER_FILL_EASING_CLASS,
@@ -67,7 +68,7 @@ export function Work(): React.ReactElement {
       id="work"
       className="relative w-full bg-[#050505] py-24 text-white md:py-32"
     >
-      <div className="container mx-auto px-6 md:px-10">
+      <div className="portfolio-section-container px-6 md:px-10">
         <div className="mb-20 flex flex-col items-start justify-between border-b border-white/10 pb-6 md:flex-row md:items-end">
           <div className="overflow-hidden">
             <h2 className="work-header-anim font-heading text-[10vw] font-black uppercase leading-[0.8] tracking-tighter text-white opacity-0 md:text-[6vw]">
@@ -170,6 +171,7 @@ export function Work(): React.ReactElement {
                   className="group relative pointer-events-auto flex items-center gap-3 overflow-hidden rounded-full border border-white/20 bg-white/10 px-8 py-4 text-white backdrop-blur-md"
                   data-scroll-hover=""
                   aria-label={`View ${projects[activeIndex]?.title} case study`}
+                  {...getHoverFillTouchHandlers()}
                 >
                   <HoverFillOverlay />
                   <span
@@ -196,6 +198,7 @@ export function Work(): React.ReactElement {
                 href={getProjectPath(project.id)}
                 className="work-mobile-item group flex flex-col gap-6 opacity-0"
                 data-scroll-hover=""
+                {...getHoverFillTouchHandlers()}
               >
                 <div className="relative aspect-4/3 w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">
                   <Image
@@ -208,7 +211,7 @@ export function Work(): React.ReactElement {
                   <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60 transition-opacity duration-500 group-hocus:opacity-80" />
                   <div className="absolute bottom-5 right-5">
                     <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20 text-white">
-                      <HoverFillOverlay />
+                      <HoverFillOverlay variant="icon" />
                       <ArrowUpRight
                         className={`relative z-10 h-4 w-4 ${HOVER_FILL_DURATION_CLASS} ${HOVER_FILL_EASING_CLASS} transition-colors group-hocus:text-black`}
                         aria-hidden="true"

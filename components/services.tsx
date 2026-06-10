@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ArrowUpRight } from "lucide-react";
 import { useRef } from "react";
 import {
+  getHoverFillTouchHandlers,
   HoverFillOverlay,
   HOVER_FILL_DURATION_CLASS,
   HOVER_FILL_EASING_CLASS,
@@ -20,7 +21,7 @@ import { useScrollReveal } from "@/lib/use-scroll-reveal";
 
 export function Services(): React.ReactElement {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const { listRef, setRowRef, onRowEnter, onListLeave, toggleService } =
+  const { listRef, visibleIndex, onRowEnter, onListLeave, toggleService } =
     useServicePanels();
 
   useScrollReveal(sectionRef, {
@@ -86,6 +87,10 @@ export function Services(): React.ReactElement {
             0.55,
           );
         }
+
+        tl.eventCallback("onComplete", (): void => {
+          tl.scrollTrigger?.kill(false);
+        });
       });
     },
     { scope: sectionRef },
@@ -120,7 +125,7 @@ export function Services(): React.ReactElement {
       id="services"
       className="relative w-full bg-black px-4 py-24 text-white md:px-0 md:py-32"
     >
-      <div className="container mx-auto px-4 md:px-10">
+      <div className="portfolio-section-container px-4 md:px-10">
         <div className="mb-20 flex flex-col items-start justify-between border-b border-white/10 pb-8 md:flex-row md:items-end">
           <div className="overflow-hidden">
             <h2 className="service-header-anim font-heading text-[10vw] font-black uppercase leading-[0.85] tracking-tighter text-white opacity-0 md:text-[6vw]">
@@ -144,14 +149,12 @@ export function Services(): React.ReactElement {
           {services.map((service, index: number): React.ReactElement => {
             const panelId: string = `service-panel-${service.number}`;
             const triggerId: string = `service-trigger-${service.number}`;
+            const isOpen: boolean = visibleIndex === index;
 
             return (
               <div
                 key={service.title}
-                ref={(element: HTMLDivElement | null): void => {
-                  setRowRef(index, element);
-                }}
-                className="service-row group relative"
+                className="service-row relative"
                 onMouseEnter={(): void => onRowEnter(index)}
               >
                 <div className="service-divider absolute bottom-0 left-0 h-px w-full origin-left bg-white/10" />
@@ -159,24 +162,31 @@ export function Services(): React.ReactElement {
                   <button
                     id={triggerId}
                     type="button"
-                    className="service-item-anim flex w-full cursor-pointer appearance-none flex-col justify-between bg-transparent py-10 text-left transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf] group-hocus:px-4 md:flex-row md:items-center"
-                    aria-expanded={false}
+                    className={`service-item-anim group flex w-full cursor-pointer appearance-none flex-row items-center justify-between gap-4 bg-transparent py-10 text-left transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fde8bf] ${isOpen ? "px-4" : ""}`}
+                    aria-expanded={isOpen}
                     aria-controls={panelId}
                     onClick={(): void => toggleService(index)}
+                    {...getHoverFillTouchHandlers()}
                   >
-                    <span className="flex items-baseline gap-6 md:gap-10">
-                      <span className="font-mono text-sm text-gray-500 transition-colors group-hocus:text-[#fde8bf]">
+                    <span className="flex min-w-0 flex-1 items-baseline gap-4 md:gap-10">
+                      <span
+                        className={`shrink-0 font-mono text-sm transition-colors duration-500 ${isOpen ? "text-[#fde8bf]" : "text-gray-500"}`}
+                      >
                         {service.number}
                       </span>
-                      <span className="font-heading text-4xl font-bold uppercase text-white transition-transform duration-500 group-hocus:translate-x-2 md:text-6xl">
+                      <span
+                        className={`min-w-0 font-heading text-[clamp(1.5rem,5.75vw,2.25rem)] font-bold uppercase leading-[0.92] tracking-tight text-white transition-transform duration-500 md:text-6xl md:leading-none md:tracking-normal ${isOpen ? "translate-x-2" : ""}`}
+                      >
                         {service.title}
                       </span>
                     </span>
-                    <span className="service-arrow-wrap group/icon relative mt-4 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-white/20 text-white md:mt-0">
-                      <HoverFillOverlay groupName="icon" />
+                    <span className="service-arrow-wrap relative ml-2 flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20 text-white">
+                      <HoverFillOverlay
+                        variant="icon"
+                        fillState={isOpen ? "filled" : "auto"}
+                      />
                       <ArrowUpRight
-                        data-service-arrow
-                        className={`relative z-10 h-4 w-4 ${HOVER_FILL_DURATION_CLASS} ${HOVER_FILL_EASING_CLASS} transition-colors group-hocus-icon:text-black`}
+                        className={`relative z-10 h-4 w-4 ${HOVER_FILL_DURATION_CLASS} ${HOVER_FILL_EASING_CLASS} transition-colors ${isOpen ? "rotate-45 text-black" : "group-hocus:text-black"}`}
                         aria-hidden="true"
                       />
                     </span>
@@ -185,8 +195,8 @@ export function Services(): React.ReactElement {
                 <div
                   id={panelId}
                   aria-labelledby={triggerId}
-                  aria-hidden
-                  className={`service-panel max-h-0 overflow-hidden opacity-0 transition-[max-height,opacity] ${SERVICE_PANEL_EASE_CLASS}`}
+                  aria-hidden={!isOpen}
+                  className={`service-panel overflow-hidden transition-[max-height,opacity] ${SERVICE_PANEL_EASE_CLASS} ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
                 >
                   <div className="grid grid-cols-1 gap-8 pb-10 md:grid-cols-2 md:pl-[120px]">
                     <p className="max-w-md text-lg font-light leading-relaxed text-gray-400 md:text-xl">

@@ -1,10 +1,16 @@
 "use client";
 
 import { scheduleScrollLayoutRefresh } from "@/lib/animation";
+import { mediaQueryMd } from "@/lib/breakpoints";
 import { setServicePanelsState } from "@/lib/service-panels-state";
-import { useCallback, useEffect, useRef, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 
-export const SERVICE_PANEL_SELECTOR = ".service-panel";
 export const SERVICE_PANEL_EASE_CLASS =
   "ease-[cubic-bezier(0.76,0,0.24,1)] duration-700";
 
@@ -24,34 +30,15 @@ function isPanelTransitionProperty(propertyName: string): boolean {
   return PANEL_TRANSITION_PROPERTIES.has(propertyName);
 }
 
-/** Imperative open/close — avoids React re-renders on hover. */
-export function syncServicePanelRows(
-  rows: readonly (HTMLDivElement | null)[],
-  visibleIndex: number,
-): void {
-  rows.forEach((row: HTMLDivElement | null, index: number): void => {
-    if (!row) {
-      return;
-    }
+function supportsHoverInteraction(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
 
-    const panel: HTMLElement | null = row.querySelector(SERVICE_PANEL_SELECTOR);
-    const button: HTMLButtonElement | null = row.querySelector("button");
-    const arrow: SVGElement | null = row.querySelector("[data-service-arrow]");
-
-    if (!panel || !button) {
-      return;
-    }
-
-    const isOpen: boolean = index === visibleIndex;
-
-    panel.classList.toggle("max-h-96", isOpen);
-    panel.classList.toggle("opacity-100", isOpen);
-    panel.classList.toggle("max-h-0", !isOpen);
-    panel.classList.toggle("opacity-0", !isOpen);
-    button.setAttribute("aria-expanded", String(isOpen));
-    panel.setAttribute("aria-hidden", String(!isOpen));
-    arrow?.classList.toggle("rotate-45", isOpen);
-  });
+  return (
+    window.matchMedia(mediaQueryMd).matches &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
 }
 
 function usePanelTransitionBus(
@@ -128,61 +115,63 @@ function usePanelTransitionBus(
 
 export type UseServicePanelsResult = {
   listRef: RefObject<HTMLDivElement | null>;
-  setRowRef: (index: number, element: HTMLDivElement | null) => void;
+  visibleIndex: number;
   onRowEnter: (index: number) => void;
   onListLeave: () => void;
   toggleService: (index: number) => void;
 };
 
-/** Hover + click panel state without re-rendering Services on every mouseenter. */
+function clearServiceRowPressState(row: HTMLElement | null): void {
+  row?.querySelector<HTMLButtonElement>("button")?.blur();
+}
+
+/** Tap on touch, hover-preview on desktop — open visuals driven by React state. */
 export function useServicePanels(): UseServicePanelsResult {
   const listRef = useRef<HTMLDivElement | null>(null);
-  const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const selectedIndexRef = useRef<number>(-1);
-  const hoveredIndexRef = useRef<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const getVisibleIndex = useCallback((): number => {
-    return hoveredIndexRef.current ?? selectedIndexRef.current;
-  }, []);
+  const visibleIndex: number =
+    supportsHoverInteraction() && hoveredIndex !== null
+      ? hoveredIndex
+      : selectedIndex;
 
-  const syncRows = useCallback((): void => {
-    syncServicePanelRows(rowRefs.current, getVisibleIndex());
-  }, [getVisibleIndex]);
+  const getVisibleIndex = useCallback((): number => visibleIndex, [visibleIndex]);
 
   usePanelTransitionBus(listRef, getVisibleIndex);
 
-  const onRowEnter = useCallback(
-    (index: number): void => {
-      hoveredIndexRef.current = index;
-      syncRows();
-    },
-    [syncRows],
-  );
+  const onRowEnter = useCallback((index: number): void => {
+    if (!supportsHoverInteraction()) {
+      return;
+    }
+
+    setHoveredIndex(index);
+  }, []);
 
   const onListLeave = useCallback((): void => {
-    hoveredIndexRef.current = null;
-    syncRows();
-  }, [syncRows]);
+    setHoveredIndex(null);
+  }, []);
 
-  const toggleService = useCallback(
-    (index: number): void => {
-      selectedIndexRef.current =
-        selectedIndexRef.current === index ? -1 : index;
-      syncRows();
-    },
-    [syncRows],
-  );
+  const toggleService = useCallback((index: number): void => {
+    setSelectedIndex((currentIndex: number): number => {
+      const isClosing = currentIndex === index;
 
-  const setRowRef = useCallback(
-    (index: number, element: HTMLDivElement | null): void => {
-      rowRefs.current[index] = element;
-    },
-    [],
-  );
+      if (isClosing) {
+        const row = listRef.current?.querySelectorAll<HTMLElement>(
+          ".service-row",
+        )[index];
+        clearServiceRowPressState(row ?? null);
+        return -1;
+      }
+
+      return index;
+    });
+    setHoveredIndex(null);
+  }, []);
 
   return {
     listRef,
-    setRowRef,
+    visibleIndex,
     onRowEnter,
     onListLeave,
     toggleService,

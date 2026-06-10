@@ -162,9 +162,10 @@ export function Navbar(): React.ReactElement {
               ref={menuButtonRef}
               as="button"
               type="button"
-              fillState={menuFillState}
-              className="rounded-full p-2 text-white md:hidden"
-              contentClassName="flex items-center justify-center text-white transition-colors duration-500 group-hocus:text-black"
+              variant="icon"
+              fillState={isOpen ? "filled" : menuFillState}
+              className="rounded-full text-white md:hidden"
+              contentClassName="text-white transition-colors duration-500 group-hocus:text-black"
               onClick={(): void =>
                 setIsOpen((currentValue: boolean): boolean => {
                   if (currentValue) {

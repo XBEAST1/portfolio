@@ -139,7 +139,7 @@ export const projects: readonly Project[] = [
       "AWS Lambda",
     ],
     highlights: [
-      "Architected the Blind Vault — a 4-phase zero-knowledge E2EE handshake across REST and SSE, with resumable batch migration for large libraries.",
+      "Architected the Blind Vault a 4-phase zero-knowledge E2EE handshake across REST and SSE, with resumable batch migration for large libraries.",
       "Built a 6-phase production RAG pipeline: hybrid pgvector + BM25 retrieval, reciprocal rank fusion, cross-encoder reranking, and grounding guards.",
       "Streamed multimodal AI interpretations in real time via Server-Sent Events, with Redis-backed context caching and intelligent Gemini API key rotation.",
     ],
@@ -159,7 +159,7 @@ export const projects: readonly Project[] = [
     image: nextPgpManageKeyrings,
     href: "https://nextpgp.vercel.app",
     tagline:
-      "A zero-knowledge PGP Progressive Web App for key generation, keyring management, and end-to-end encrypted cloud vaults — all in the browser.",
+      "A zero-knowledge PGP Progressive Web App for key generation, keyring management, and end-to-end encrypted cloud vaults all in the browser.",
     overview:
       "Next PGP is a full-featured cryptographic workstation delivered as a PWA. Users generate keys across modern algorithms (Curve25519, NIST curves, RSA), manage keyrings locally in IndexedDB, encrypt and decrypt messages and files including batch and folder operations and optionally sync encrypted backups through a zero-knowledge cloud vault. Every cryptographic operation runs client-side via the Web Crypto API, vault passwords are never sent to the server, and a dynamic Web Worker pool scales heavy workloads across all CPU cores without blocking the UI.",
     role: "Solo product design, zero-knowledge architecture, full stack engineering, PWA",
@@ -179,9 +179,9 @@ export const projects: readonly Project[] = [
       "TypeScript",
     ],
     highlights: [
-      "Designed a zero-knowledge vault with PBKDF2-SHA512 (1M iterations), AES-256-GCM, HMAC integrity checks, and client-side verification ciphers — the server never sees plaintext keys or passwords.",
+      "Designed a zero-knowledge vault with PBKDF2-SHA512 (1M iterations), AES-256-GCM, HMAC integrity checks, and client-side verification ciphers the server never sees plaintext keys or passwords.",
       "Built a dynamic Web Worker pool that parallelizes encryption and decryption across all CPU cores, keeping the interface responsive during heavy batch and folder operations.",
-      "Shipped a cross-platform PWA with offline support, app-password protection, keyserver import/export, and encrypted cloud backup — usable on Windows, macOS, Linux, Android, and iOS.",
+      "Shipped a cross-platform PWA with offline support, app-password protection, keyserver import/export, and encrypted cloud backup usable on Windows, macOS, Linux, Android, and iOS.",
     ],
     metrics: [
       { label: "Architecture", value: "Zero-Knowledge" },
@@ -278,7 +278,7 @@ export const services: readonly Service[] = [
     number: "02",
     title: "FULL STACK DEVELOPMENT",
     description:
-      "Building scalable SaaS platforms with Next.js, FastAPI, and PostgreSQL — from async REST APIs to real-time WebSocket systems.",
+      "Building scalable SaaS platforms with Next.js, FastAPI, and PostgreSQL from async REST APIs to real-time WebSocket systems.",
     tags: ["Next.js", "FastAPI", "PostgreSQL", "Docker / CI-CD"],
   },
   {
@@ -345,7 +345,7 @@ export const philosophyItems: readonly Philosophy[] = [
     eyebrow: "02 /// FULL STACK SAAS",
     title: "Scalable\nPlatforms.",
     description:
-      "Building end-to-end SaaS products with Next.js, FastAPI, and PostgreSQL — from async REST APIs to real-time systems.",
+      "Building end-to-end SaaS products with Next.js, FastAPI, and PostgreSQL from async REST APIs to real-time systems.",
   },
   {
     eyebrow: "03 /// ZERO-KNOWLEDGE",

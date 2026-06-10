@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer/footer";
 import { HomeSectionHoverFill } from "@/components/home-section-hover-fill";
 import { HomeSectionLink } from "@/components/home-section-link";
 import { HoverFill } from "@/components/hover-fill";
+import { mediaQueryLg } from "@/lib/breakpoints";
 import {
   contactSectionHref,
   getProjectById,
@@ -150,7 +151,7 @@ export default async function ProjectPage(
                   alt={`${project.title} interface preview`}
                   fill
                   priority
-                  sizes="(min-width: 1024px) 52vw, 100vw"
+                  sizes={`${mediaQueryLg} 52vw, 100vw`}
                   className="object-contain p-4 md:p-8"
                 />
               </div>
@@ -348,7 +349,7 @@ export default async function ProjectPage(
                             src={image}
                             alt={`${project.title} screenshot ${index + 1}`}
                             fill
-                            sizes="(min-width: 1024px) 82vw, 100vw"
+                            sizes={`${mediaQueryLg} 82vw, 100vw`}
                             className="object-contain p-2 transition-transform duration-700 group-hocus:scale-[1.015] md:p-4"
                           />
                         </div>
