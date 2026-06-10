@@ -56,7 +56,7 @@ export function Services(): React.ReactElement {
       const masterTl = gsap.timeline({
         scrollTrigger: {
           trigger: ".services-list",
-          start: "top 150%",
+          start: "top 200%",
           toggleActions: SECTION_REPLAY_TOGGLE_ACTIONS,
         },
       });
