@@ -6,11 +6,26 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { scheduleScrollLayoutRefresh } from "@/lib/animation";
 import { lockPageScroll, unlockPageScroll } from "@/lib/lock-scroll";
-import { navbarBrandName } from "@/lib/portfolio-data";
+import {
+  getProjectById,
+  location,
+  navbarBrandName,
+  roleTitle,
+} from "@/lib/portfolio-data";
 import { resetScrollToTop } from "@/lib/preloader/reset-scroll-to-top";
 import { markSpaNavigationOccurred } from "@/lib/preloader/preloader-state";
 
 const INTERNAL_TRANSITION_ATTRIBUTE = "data-route-transition";
+
+interface TransitionCornerLabels {
+  readonly left: string;
+  readonly right: string;
+}
+
+const DEFAULT_CORNER_LABELS: TransitionCornerLabels = {
+  left: roleTitle,
+  right: location,
+};
 
 function getTransitionLabel(url: URL): string {
   if (url.pathname === "/") {
@@ -22,6 +37,23 @@ function getTransitionLabel(url: URL): string {
   }
 
   return "Loading";
+}
+
+function getTransitionCornerLabels(url: URL): TransitionCornerLabels {
+  const projectMatch = /^\/projects\/([^/]+)/.exec(url.pathname);
+
+  if (projectMatch) {
+    const project = getProjectById(projectMatch[1]);
+
+    if (project) {
+      return {
+        left: project.timeline,
+        right: project.category,
+      };
+    }
+  }
+
+  return DEFAULT_CORNER_LABELS;
 }
 
 function isPlainLeftClick(event: MouseEvent): boolean {
@@ -93,6 +125,9 @@ export function RouteTransition(): React.ReactElement {
   const pendingDestinationRef = useRef<string | null>(null);
   const isTransitioningRef = useRef<boolean>(false);
   const [transitionLabel, setTransitionLabel] = useState<string>("Portfolio");
+  const [cornerLabels, setCornerLabels] = useState<TransitionCornerLabels>(
+    DEFAULT_CORNER_LABELS,
+  );
 
   useGSAP(
     (): void => {
@@ -135,6 +170,7 @@ export function RouteTransition(): React.ReactElement {
       lockPageScroll();
       markSpaNavigationOccurred();
       setTransitionLabel(getTransitionLabel(destination));
+      setCornerLabels(getTransitionCornerLabels(destination));
       activeTimelineRef.current?.kill();
 
       const timeline = gsap.timeline({
@@ -297,7 +333,7 @@ export function RouteTransition(): React.ReactElement {
           className="absolute bottom-8 left-8 z-10 translate-y-5 opacity-0"
         >
           <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
-            Route Shift
+            {cornerLabels.left}
           </p>
         </div>
         <div
@@ -305,7 +341,7 @@ export function RouteTransition(): React.ReactElement {
           className="absolute bottom-8 right-8 z-10 translate-y-5 opacity-0"
         >
           <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-gray-600">
-            Smooth Handoff
+            {cornerLabels.right}
           </p>
         </div>
       </div>
