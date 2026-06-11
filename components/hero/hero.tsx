@@ -46,7 +46,7 @@ export function Hero(): React.ReactElement {
 
       <div className="relative z-10 grid min-h-0 w-full flex-1 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-3 md:grid-cols-12 md:grid-rows-1 md:gap-4">
         <div className="flex min-h-0 flex-col gap-3 md:col-span-7 md:h-full md:gap-4">
-          <div className="bento-item group relative flex shrink-0 flex-col gap-4 rounded-4xl border border-white/10 bg-white/5 p-4 sm:min-h-0 sm:flex-1 sm:justify-between sm:gap-0 sm:overflow-hidden sm:p-5 md:p-8 lg:p-10">
+          <div className="bento-item group relative flex shrink-0 flex-col gap-4 rounded-4xl border border-white/10 bg-white/5 p-4 sm:min-h-0 sm:flex-1 sm:justify-between sm:gap-0 sm:overflow-hidden sm:p-5 md:p-10">
             <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
               <div className="rounded-full border border-white/20 bg-black/20 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest backdrop-blur-md sm:px-3 sm:text-[10px]">
                 <span className="sm:hidden">{navbarBrandName} / Dev</span>
@@ -69,7 +69,7 @@ export function Hero(): React.ReactElement {
             </div>
 
             <div className="min-w-0 sm:mt-4 md:mt-6">
-              <h1 className="font-heading text-[clamp(1.75rem,7vw,2.75rem)] font-black uppercase leading-[0.92] tracking-tighter text-white mix-blend-overlay sm:text-[clamp(2.25rem,6vw,3.5rem)] md:text-[5vw] md:leading-[0.85] lg:text-[4.5vw]">
+              <h1 className="font-heading text-[clamp(1.75rem,7vw,2.75rem)] font-black uppercase leading-[0.92] tracking-tighter text-white mix-blend-overlay sm:text-[clamp(2.25rem,6vw,3.5rem)] md:text-[4.5vw] md:leading-[0.85]">
                 {displayName.split(" ").map(
                   (word: string): React.ReactElement => (
                     <span key={word} className="block">
@@ -92,14 +92,14 @@ export function Hero(): React.ReactElement {
                   ),
                 )}
               </h1>
-              <p className="mt-2 max-w-lg text-[10px] uppercase leading-relaxed tracking-[0.12em] text-gray-400 sm:mt-3 sm:text-xs sm:tracking-[0.25em] md:mt-4 md:text-sm md:tracking-[0.35em] lg:text-base">
+              <p className="mt-2 max-w-lg text-[10px] uppercase leading-relaxed tracking-[0.12em] text-gray-400 sm:mt-3 sm:text-xs sm:tracking-[0.25em] md:mt-4 md:text-base md:tracking-[0.35em]">
                 {roleTitle} building scalable SaaS platforms, RAG pipelines, and
                 zero-knowledge AI systems.
               </p>
             </div>
           </div>
 
-          <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2 md:h-36 lg:h-40">
+          <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2 md:h-40">
             <HeroStatusCard />
 
             <div className="bento-item relative flex h-full flex-col justify-between overflow-hidden rounded-4xl border border-white/10 bg-[#0a0a0a] p-5 md:p-6 transition-colors hover:border-white/30">

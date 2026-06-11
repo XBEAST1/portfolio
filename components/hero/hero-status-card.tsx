@@ -54,7 +54,7 @@ export function HeroStatusCard(): React.ReactElement {
 
         <div>
           <div className="group-hocus:hidden">
-            <h2 className="mb-1 font-mono text-xl font-light text-white md:text-2xl lg:text-3xl">
+            <h2 className="mb-1 font-mono text-xl font-light text-white md:text-3xl">
               {activeSlide.headline}
             </h2>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
@@ -63,7 +63,7 @@ export function HeroStatusCard(): React.ReactElement {
           </div>
 
           <div className="hidden group-hocus:block">
-            <h2 className="mb-1 font-mono text-xl font-light text-white md:text-2xl lg:text-3xl">
+            <h2 className="mb-1 font-mono text-xl font-light text-white md:text-3xl">
               READY FOR YOU.
             </h2>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#fde8bf]">

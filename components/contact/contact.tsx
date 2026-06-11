@@ -70,12 +70,12 @@ export function Contact(): React.ReactElement {
       <div className="portfolio-section-container flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-0">
         <div className="max-w-3xl">
           <div className="contact-heading-wrap mb-8">
-            <div className="overflow-hidden">
+            <div>
               <h2 className="contact-heading-anim inline-block origin-bottom font-heading text-[10vw] font-black uppercase leading-[0.85] tracking-tighter lg:text-[6vw]">
                 LET&apos;S BUILD
               </h2>
             </div>
-            <div className="overflow-hidden">
+            <div>
               <h2 className="contact-heading-anim inline-block origin-bottom font-heading text-[10vw] font-black uppercase leading-[0.85] tracking-tighter lg:text-[6vw]">
                 <a
                   href={emailMailtoHref}
