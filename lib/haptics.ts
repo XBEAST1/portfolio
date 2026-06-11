@@ -6,16 +6,175 @@ import { isTouchPrimaryDevice, prefersReducedMotion } from "@/lib/animation";
 type HapticPattern = "tap" | "select" | "success" | "reveal";
 
 /**
- * Haptic intensity config (Android: vibration duration in ms).
- * Higher number = stronger/longer pulse. Arrays are [vibrate, pause, vibrate, ...].
+ * Actuator tier inferred from device heuristics (no web API exposes LRA vs ERM).
+ * LRA phones get short, crisp pulses; ERM phones get longer, simpler ones.
  */
-export const HAPTIC_PATTERNS: Readonly<Record<HapticPattern, number | number[]>> =
+export type HapticTier = "lra" | "default";
+
+/** Short pulses tuned for LRAs (Pixel, flagships) — ~10–20 ms per Android haptics guidance. */
+const LRA_HAPTIC_PATTERNS: Readonly<Record<HapticPattern, number | number[]>> =
   {
     tap: 6,
     select: 4,
-    success: [4, 50, 4],
-    reveal: 1,
+    success: [4, 40, 4],
+    reveal: 2,
   };
+
+/** Longer pulses for ERM motors that need spin-up time to feel perceptible. */
+const DEFAULT_HAPTIC_PATTERNS: Readonly<
+  Record<HapticPattern, number | number[]>
+> = {
+  tap: 55,
+  select: 50,
+  success: [50, 50, 50],
+  reveal: 38,
+};
+
+interface NavigatorUAData {
+  readonly mobile: boolean;
+  getHighEntropyValues(
+    hints: readonly string[],
+  ): Promise<{ model?: string }>;
+}
+
+const LRA_MODEL_RE =
+  /(?:pixel|nothing phone|(?:^|\s)(?:sm-[sfn]|le21|le22|cph24|cph25|xq-[ctde]))/i;
+
+/** Full UA still exposes model names; reduced Chrome UA uses the placeholder `K`. */
+const LRA_UA_RE =
+  /(?:;\s*pixel\b|pixel \d|nothing phone|sm-[sfn]\d{3}|oneplus (?:1[0-9]|[89](?:\s|pro|$)))/i;
+
+const REDUCED_ANDROID_UA_RE = /Android 10; K\b/;
+
+const DEV_TIER_OVERRIDE_KEY = "portfolio-haptic-tier";
+
+let cachedTier: HapticTier | null = null;
+let tierResolution: Promise<HapticTier> | null = null;
+
+function getUAData(): NavigatorUAData | undefined {
+  return (navigator as Navigator & { userAgentData?: NavigatorUAData })
+    .userAgentData;
+}
+
+function isLraCapableModel(model: string): boolean {
+  return LRA_MODEL_RE.test(model.trim());
+}
+
+function readDevTierOverride(): HapticTier | null {
+  if (process.env.NODE_ENV === "production") {
+    return null;
+  }
+
+  try {
+    const value = localStorage.getItem(DEV_TIER_OVERRIDE_KEY);
+
+    if (value === "lra" || value === "default") {
+      return value;
+    }
+  } catch {
+    /* localStorage unavailable */
+  }
+
+  return null;
+}
+
+async function fetchModelFromClientHints(): Promise<string | null> {
+  const uaData = getUAData();
+
+  if (!uaData?.mobile || !window.isSecureContext) {
+    return null;
+  }
+
+  try {
+    const { model } = await uaData.getHighEntropyValues(["model"]);
+    return model?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function ensureHapticTierResolved(): Promise<HapticTier> {
+  if (cachedTier !== null) {
+    return Promise.resolve(cachedTier);
+  }
+
+  if (tierResolution) {
+    return tierResolution;
+  }
+
+  tierResolution = (async (): Promise<HapticTier> => {
+    const devOverride = readDevTierOverride();
+
+    if (devOverride) {
+      cachedTier = devOverride;
+      return devOverride;
+    }
+
+    const ua = navigator.userAgent;
+
+    if (LRA_UA_RE.test(ua)) {
+      cachedTier = "lra";
+      return "lra";
+    }
+
+    const model = await fetchModelFromClientHints();
+
+    if (model && isLraCapableModel(model)) {
+      cachedTier = "lra";
+      return "lra";
+    }
+
+    cachedTier = "default";
+    return "default";
+  })();
+
+  return tierResolution;
+}
+
+/** Re-run Client Hints after a user gesture if the reduced UA blocked sync detection. */
+function retryHapticTierFromClientHints(): void {
+  if (cachedTier === "lra" || !REDUCED_ANDROID_UA_RE.test(navigator.userAgent)) {
+    return;
+  }
+
+  void fetchModelFromClientHints().then((model) => {
+    if (model && isLraCapableModel(model)) {
+      cachedTier = "lra";
+    }
+  });
+}
+
+/** Returns the inferred actuator tier (may upgrade after Client Hints resolve). */
+export function getHapticTier(): HapticTier {
+  if (cachedTier !== null) {
+    return cachedTier;
+  }
+
+  if (typeof navigator !== "undefined" && LRA_UA_RE.test(navigator.userAgent)) {
+    cachedTier = "lra";
+    return "lra";
+  }
+
+  void ensureHapticTierResolved();
+
+  return cachedTier ?? "default";
+}
+
+function getHapticPatterns(): Readonly<Record<HapticPattern, number | number[]>> {
+  return getHapticTier() === "lra"
+    ? LRA_HAPTIC_PATTERNS
+    : DEFAULT_HAPTIC_PATTERNS;
+}
+
+/**
+ * Active haptic pattern set for the current device tier.
+ * Prefer `getHapticTier()` when branching behavior; use this for durations only.
+ */
+export function getActiveHapticPatterns(): Readonly<
+  Record<HapticPattern, number | number[]>
+> {
+  return getHapticPatterns();
+}
 
 /** Minimum gap between haptics so nested buttons do not double-fire (ms). */
 export const HAPTIC_DEBOUNCE_MS = 50;
@@ -58,7 +217,7 @@ function vibrate(pattern: HapticPattern, skipDebounce = false): boolean {
   }
 
   lastTriggerAt = now;
-  return navigator.vibrate(HAPTIC_PATTERNS[pattern]);
+  return navigator.vibrate(getHapticPatterns()[pattern]);
 }
 
 function tryDeliverPending(): boolean {
@@ -106,12 +265,16 @@ export function initTouchHaptics(): (() => void) | undefined {
     return undefined;
   }
 
+  void ensureHapticTierResolved();
+
   const opts: AddEventListenerOptions = { capture: true, passive: true };
 
   const onPointerDown = (event: PointerEvent): void => {
     if (!TOUCH_TYPES.has(event.pointerType)) {
       return;
     }
+
+    retryHapticTierFromClientHints();
 
     if (tryDeliverPending()) {
       suppressedPointerIds.add(event.pointerId);
@@ -168,7 +331,11 @@ export function initTouchHaptics(): (() => void) | undefined {
       return;
     }
 
-    vibrate(getTapPattern(target));
+    const pattern = getTapPattern(target);
+
+    void ensureHapticTierResolved().then(() => {
+      vibrate(pattern);
+    });
   };
 
   const onPointerCancel = (event: PointerEvent): void => {
